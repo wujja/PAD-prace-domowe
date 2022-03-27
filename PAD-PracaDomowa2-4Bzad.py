@@ -1,3 +1,6 @@
+from select import select
+
+
 class Game():
     def _play(self):
         self.how_many_players()          
@@ -19,19 +22,19 @@ class Hangman(Game):
     def __init__(self):
         self.level = ""
         self.level_of_difficulty = ["beginner", "intermediate", "advanced"]
-        self.list_of_words = ["apple", "orange", "car", "cat", "cow", "pineapple", "window", "pensil"]
+        self.list_of_words = ["apple", "orange", "car", "cat", "cow", "pineapple", "window", "pencil"]
 
     def difficult_level(self):
-        level = ""
+        self.level = ""
         list_of_choise = ["a", "b", "i"]
-        while(level not in list_of_choise):
+        while(self.level not in list_of_choise):
             try:
-                level = input("Which level of difficulty do you want to play? Type b - beginner, i - intermediate, a - advanced:\n" )
-                if(level not in list_of_choise):
+                self.level = input("Which level of difficulty do you want to play? Type b - beginner, i - intermediate, a - advanced:\n" )
+                if(self.level not in list_of_choise):
                     print("Please write a, b or i")
             except:
                 print("Something goes wrong") #chyba niepotrzebne
-        self.how_many_tries(level)
+        self.how_many_tries(self.level)
 
     def how_many_tries(self, level_from_user = ""):
         if(level_from_user == "b" or self.level == self.level_of_difficulty[0]):
@@ -56,28 +59,42 @@ class Hangman(Game):
         self.difficult_level()
         print(f'Difficulty level: {self.level}, number of tries {self.no_tries}')
         self.choose_word()
-        print(self.word.word_to_show)
-        self.next_round()
-
         
-    
+
     def end_of_game(self):
         if(self.word.word == self.word.word_to_show):
             print("You won congratulation!!")
             print(f'Word to guess: {self.word.word_to_show}')
             self.game_over = True
+            if(self.no_players == 1):
+                return self.game_over
+            else:
+                if(self.round != self.no_players):
+                    self.next_player()
+                else:
+                    return self.game_over
+            
         if(self.no_players == 1 and self.no_tries == 0):
             self.game_over = True
-        elif(self.no_players != 1 and self.no_tries == 0):
+            print("You lost")
+            
+        elif(self.no_players != 1 and self.no_tries == 0):   
             if(self.round != self.no_players):
-                self.round += 1
-                self.how_many_tries()
-                print(f'Round {self.round}')
-                self.choose_word()
+                print("You lost")
+                self.next_player()
             else:
                 self.game_over = True
+                print("You lost")
 
+        return self.game_over
     
+    def next_player(self):
+        self.game_over = False
+        self.round += 1
+        self.how_many_tries()
+        print(f'Round {self.round}')
+        self.choose_word()
+
     def choose_word(self):
         import random
         if (self.no_players == 1):
@@ -87,6 +104,8 @@ class Hangman(Game):
             while(not word.isalpha()):
                 word = input("Please write a word for other player: \n")
                 self.word = WordToGuess(word.lower())  
+        print(self.word.word_to_show)
+        self.next_round()
 
     def next_round(self):
         letter = ""
@@ -97,9 +116,8 @@ class Hangman(Game):
         
         if(not self.word.new_letter(letter=letter.lower())):
             self.no_tries -= 1
-        self.end_of_game()
 
-        if(self.game_over):
+        if(self.end_of_game()):
             once_again = input("Do you want to play once again? Type 'y' to play once again:\n")
             if(once_again.lower()== 'y'):
                 self._play()
@@ -126,7 +144,6 @@ class WordToGuess():
                     word_as_list[i] = letter
             self.word_to_show = "".join(word_as_list)
             print("Good choice")
-            print(f'Your current state: {self.word_to_show}')
             return True
         else:
             print("Bad choice")
