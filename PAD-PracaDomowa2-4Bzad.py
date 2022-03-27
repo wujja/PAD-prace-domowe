@@ -1,6 +1,3 @@
-from select import select
-
-
 class Game():
     def _play(self):
         self.how_many_players()          
@@ -77,7 +74,6 @@ class Hangman(Game):
         if(self.no_players == 1 and self.no_tries == 0):
             self.game_over = True
             print("You lost")
-            
         elif(self.no_players != 1 and self.no_tries == 0):   
             if(self.round != self.no_players):
                 print("You lost")
@@ -127,7 +123,6 @@ class Hangman(Game):
             
         
 class WordToGuess():
-    
     def __init__(self, word):
         self.word = word
         self.changeToFloor()
@@ -148,7 +143,6 @@ class WordToGuess():
         else:
             print("Bad choice")
             return False
-
 
 
 d = Hangman()
